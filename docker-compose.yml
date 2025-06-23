@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"  # UI
+      - "6831:6831/udp" # Agent
+
+  fluentd:
+    image: fluent/fluentd:v1.14
+    ports:
+      - "24224:24224"
+    volumes:
+      - ./logging/fluentd/fluentd-config.yaml:/fluentd/etc/fluent.conf
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.10.0
+    ports:
+      - "5601:5601"
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus-config.yaml:/etc/prometheus/prometheus.yml
+
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager/alertmanager-config.yaml:/etc/alertmanager/config.yml
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      - ./dashboards/grafana/datasources/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+

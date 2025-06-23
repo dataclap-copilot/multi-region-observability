@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jaeger-config
+data:
+  JAEGER_AGENT_PORT: "6831"
+  JAEGER_SAMPLER_TYPE: const
+  JAEGER_SAMPLER_PARAM: "1"
